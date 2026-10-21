@@ -1,170 +1,265 @@
-/* khalidin.com | 3D hero: three nested GRC rings that tell the scroll story */
+/* khalidin.com · v3 · "Live audit"
+   Thousands of transactions (points) morph through four states as you scroll:
+   0 population (a spiral cloud) · 1 ledger, swept by a scan beam that flags exceptions
+   2 Benford's first-digit distribution as 3D bars · 3 assurance sphere with exceptions in orbit */
 import * as THREE from "three";
-import { RoomEnvironment } from "./vendor/RoomEnvironment.js";
 
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const smooth = t => { t = clamp(t); return t * t * (3 - 2 * t); };
 const lerp = (a, b, t) => a + (b - a) * t;
-const wrapHalfPi = a => { a = ((a + Math.PI / 2) % Math.PI + Math.PI) % Math.PI; return a - Math.PI / 2; };
 
-function glowTexture(c1, c2) {
-  const s = 256, cv = document.createElement("canvas");
-  cv.width = cv.height = s;
-  const g = cv.getContext("2d");
-  const grd = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
-  grd.addColorStop(0, c1); grd.addColorStop(0.35, c2); grd.addColorStop(1, "rgba(0,0,0,0)");
-  g.fillStyle = grd; g.fillRect(0, 0, s, s);
-  const t = new THREE.CanvasTexture(cv);
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
+/* deterministic RNG so the exception count is stable */
+function rng(seed) { return () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296); }
+function gauss(r) { let u = 0, v = 0; while (!u) u = r(); while (!v) v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
 
-export function startScene(canvas, S, reduce) {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.1;
+export const POPULATION = 12480;
+export const BENFORD = Array.from({ length: 9 }, (_, i) => Math.log10(1 + 1 / (i + 1)));
 
+export function startScene(canvas, S, opts = {}) {
+  const reduce = !!opts.reduce;
+  const mobile = Math.min(innerWidth, innerHeight) < 700;
+  const N = mobile ? 6240 : POPULATION;
+  const FLAG_RATE = 0.012;
+  const r = rng(20261021);
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
   const scene = new THREE.Scene();
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+  camera.position.set(0, 0, 11);
 
-  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-  camera.position.set(0, 0, 9);
+  /* ---------- build the four layouts ---------- */
+  const P0 = new Float32Array(N * 3), P1 = new Float32Array(N * 3), P2 = new Float32Array(N * 3), P3 = new Float32Array(N * 3);
+  const FL = new Float32Array(N), RD = new Float32Array(N);
+  const flags = [];
+  for (let i = 0; i < N; i++) { RD[i] = r(); if (r() < FLAG_RATE) { FL[i] = 1; flags.push(i); } }
+  const normal = []; for (let i = 0; i < N; i++) if (!FL[i]) normal.push(i);
 
-  /* lights add colour to the metal */
-  const l1 = new THREE.DirectionalLight(0x5eead4, 2.2); l1.position.set(-5, 3, 3); scene.add(l1);
-  const l2 = new THREE.DirectionalLight(0xb58cff, 2.2); l2.position.set(5, -2, 3); scene.add(l2);
-  const l3 = new THREE.DirectionalLight(0xffffff, 0.8); l3.position.set(0, 5, -4); scene.add(l3);
+  // 0 · population: three-arm spiral, tilted toward the viewer
+  const tilt0 = 1.05, c0 = Math.cos(tilt0), s0 = Math.sin(tilt0);
+  for (let i = 0; i < N; i++) {
+    let x, y, z;
+    if (r() < 0.16) { // central bulge
+      x = gauss(r) * 0.5; z = gauss(r) * 0.5; y = gauss(r) * 0.32;
+    } else {
+      const rad = 0.3 + Math.pow(r(), 1.1) * 4.1;
+      const arm = Math.floor(r() * 3);
+      const ang = arm * (Math.PI * 2 / 3) + rad * 1.05 + gauss(r) * (0.18 + rad * 0.05);
+      x = Math.cos(ang) * rad; z = Math.sin(ang) * rad;
+      y = gauss(r) * 0.14 * (1.2 - rad / 5);
+    }
+    P0[i * 3] = x; P0[i * 3 + 1] = y * c0 - z * s0; P0[i * 3 + 2] = y * s0 + z * c0;
+  }
 
-  const world = new THREE.Group(); scene.add(world);
-  const group = new THREE.Group(); world.add(group);
-
-  /* three nested rings: Governance, Risk, Compliance */
-  const R = [1.35, 1.02, 0.7];
-  const COLORS = [0x5eead4, 0x6d8dff, 0xb58cff];
-  const BASE = [[Math.PI / 2.4, 0.3], [0.5, Math.PI / 2.3], [-0.6, -0.5]];
-  const SPEED = [[0.55, 0.0], [0.0, 0.7], [0.45, 0.35]];
-  const rings = R.map((r, i) => {
-    const mat = new THREE.MeshPhysicalMaterial({
-      color: COLORS[i], metalness: 1, roughness: 0.17, clearcoat: 1, clearcoatRoughness: 0.06,
-      iridescence: 0.85, iridescenceIOR: 1.45, iridescenceThicknessRange: [180, 620],
-      envMapIntensity: 1.5, emissive: COLORS[i], emissiveIntensity: 0
-    });
-    const m = new THREE.Mesh(new THREE.TorusGeometry(r, 0.11, 96, 300), mat);
-    m.userData = { phase: [Math.random() * 3, Math.random() * 3], rot: [BASE[i][0], BASE[i][1]], pos: new THREE.Vector3(), scale: 1 };
-    group.add(m);
-    return m;
+  // 1 · ledger: a tilted spreadsheet, columns grouped into fields
+  const COLS = mobile ? 80 : 160, ROWS = Math.ceil(N / COLS);
+  const sp = mobile ? 0.058 : 0.056;
+  const fieldGap = sp * 1.6, perField = 20;
+  const ledgerW = COLS * sp + Math.floor((COLS - 1) / perField) * fieldGap;
+  const ledgerH = ROWS * sp;
+  const tilt1 = -0.42, c1 = Math.cos(tilt1), s1 = Math.sin(tilt1);
+  const order = Array.from({ length: N }, (_, i) => i).sort(() => r() - 0.5);
+  order.forEach((idx, k) => {
+    const col = k % COLS, row = Math.floor(k / COLS);
+    const x = col * sp + Math.floor(col / perField) * fieldGap - ledgerW / 2;
+    const y = ledgerH / 2 - row * sp;
+    P1[idx * 3] = x; P1[idx * 3 + 1] = y * c1; P1[idx * 3 + 2] = y * s1;
   });
 
-  /* glowing core */
-  const core = new THREE.Mesh(
-    new THREE.SphereGeometry(0.3, 64, 64),
-    new THREE.MeshPhysicalMaterial({ color: 0x0b1020, emissive: 0x6d8dff, emissiveIntensity: 1.4, roughness: 0.25, metalness: 0.2, clearcoat: 1 })
-  );
-  group.add(core);
-  const glow = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: glowTexture("rgba(160,185,255,0.95)", "rgba(109,141,255,0.35)"),
-    blending: THREE.AdditiveBlending, depthWrite: false, transparent: true
-  }));
-  glow.scale.setScalar(2.6);
-  group.add(glow);
-  const coreLight = new THREE.PointLight(0x7f9bff, 6, 6); group.add(coreLight);
-
-  /* star dust */
-  const N = 900, pos = new Float32Array(N * 3);
-  for (let i = 0; i < N; i++) {
-    const r = 3.5 + Math.random() * 7, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
-    pos[i * 3] = r * Math.sin(ph) * Math.cos(th);
-    pos[i * 3 + 1] = r * Math.sin(ph) * Math.sin(th) * 0.6;
-    pos[i * 3 + 2] = r * Math.cos(ph) - 2;
+  // 2 · Benford bars: 3D blocks, bar height follows log10(1 + 1/d); exceptions spike digit 6
+  const BAR_GAP = mobile ? 0.5 : 0.95, BW = mobile ? 0.36 : 0.62;
+  const BC = mobile ? 7 : 12, BD = mobile ? 4 : 6;
+  const bsx = BW / (BC - 1), bsz = 0.55 / (BD - 1);
+  const perLayer = BC * BD;
+  const maxRows = Math.ceil((normal.length * BENFORD[0]) / perLayer);
+  const bsy = 3.4 / maxRows, base = -2.2;
+  const barX = d => (d - 5) * BAR_GAP;
+  let cursor = 0;
+  const fillBar = (d, list, startRow) => {
+    list.forEach((idx, k) => {
+      const kk = k + startRow * perLayer;
+      const cx = kk % BC, cz = Math.floor(kk / BC) % BD, cy = Math.floor(kk / perLayer);
+      P2[idx * 3] = barX(d) - BW / 2 + cx * bsx + (r() - 0.5) * bsx * 0.5;
+      P2[idx * 3 + 1] = base + cy * bsy + (r() - 0.5) * bsy * 0.4;
+      P2[idx * 3 + 2] = -0.27 + cz * bsz + (r() - 0.5) * bsz * 0.5;
+    });
+    return Math.ceil((list.length + startRow * perLayer) / perLayer);
+  };
+  const shuffledNormal = normal.slice().sort(() => r() - 0.5);
+  let rows6 = 0;
+  for (let d = 1; d <= 9; d++) {
+    const n = d === 9 ? shuffledNormal.length - cursor : Math.round(normal.length * BENFORD[d - 1]);
+    const list = shuffledNormal.slice(cursor, cursor + n); cursor += n;
+    const rr = fillBar(d, list, 0);
+    if (d === 6) rows6 = rr;
   }
-  const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  const dust = new THREE.Points(pg, new THREE.PointsMaterial({
-    size: 0.05, map: glowTexture("rgba(255,255,255,1)", "rgba(180,200,255,0.4)"), transparent: true,
-    opacity: 0.75, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xaebfff
-  }));
-  world.add(dust);
+  fillBar(6, flags, rows6);
+  S.barTops = Array.from({ length: 9 }, (_, i) => barX(i + 1));
+  S.barBase = base;
+
+  // 3 · assurance: fibonacci sphere, exceptions on a tilted orbit
+  const R3 = 1.95, ga = Math.PI * (3 - Math.sqrt(5));
+  normal.forEach((idx, k) => {
+    const y = 1 - (k / (normal.length - 1)) * 2, rad = Math.sqrt(1 - y * y), th = ga * k;
+    P3[idx * 3] = Math.cos(th) * rad * R3; P3[idx * 3 + 1] = y * R3; P3[idx * 3 + 2] = Math.sin(th) * rad * R3;
+  });
+  const ot = 0.45;
+  flags.forEach((idx, k) => {
+    const a = (k / flags.length) * Math.PI * 2, rad = 2.85 + gauss(r) * 0.06;
+    const x = Math.cos(a) * rad, z = Math.sin(a) * rad;
+    P3[idx * 3] = x; P3[idx * 3 + 1] = -z * Math.sin(ot); P3[idx * 3 + 2] = z * Math.cos(ot);
+  });
+
+  S.flagCount = flags.length;
+  S.populationScale = POPULATION / N;
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(P0, 3));
+  geo.setAttribute("aP1", new THREE.BufferAttribute(P1, 3));
+  geo.setAttribute("aP2", new THREE.BufferAttribute(P2, 3));
+  geo.setAttribute("aP3", new THREE.BufferAttribute(P3, 3));
+  geo.setAttribute("aFlag", new THREE.BufferAttribute(FL, 1));
+  geo.setAttribute("aRand", new THREE.BufferAttribute(RD, 1));
+
+  const uniforms = {
+    uP: { value: 0 }, uTime: { value: 0 }, uScan: { value: -99 }, uDir: { value: -1 },
+    uSize: { value: mobile ? 2.6 : 2.3 }, uPR: { value: renderer.getPixelRatio() }, uReveal: { value: 0 }
+  };
+
+  const mat = new THREE.ShaderMaterial({
+    uniforms, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: /* glsl */`
+      attribute vec3 aP1; attribute vec3 aP2; attribute vec3 aP3;
+      attribute float aFlag; attribute float aRand;
+      uniform float uP, uTime, uScan, uDir, uSize, uPR, uReveal;
+      varying float vFlag; varying float vBeam; varying float vA; varying float vBoost;
+      float seg(float x){ return smoothstep(0.0, 1.0, clamp((x - aRand * 0.38) / 0.62, 0.0, 1.0)); }
+      mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
+      void main(){
+        float s1 = seg(uP), s2 = seg(uP - 1.0), s3 = seg(uP - 2.0);
+        vec3 p0 = position;
+        p0.xz = rot(uTime * 0.04) * p0.xz;
+        vec3 q = aP3;
+        if (aFlag > 0.5) { q.xz = rot(uTime * 0.22) * q.xz; }
+        vec3 p = mix(p0, aP1, s1);
+        p = mix(p, aP2, s2);
+        p = mix(p, q, s3);
+        float wob = (1.0 - s1) + s3;
+        p += 0.03 * wob * vec3(sin(uTime * 0.8 + aRand * 40.0), cos(uTime * 0.7 + aRand * 31.0), sin(uTime * 0.6 + aRand * 23.0));
+
+        vec4 mv = modelViewMatrix * vec4(p, 1.0);
+        gl_Position = projectionMatrix * mv;
+
+        float passed = step(0.0, (uScan - aP1.x) * uDir);
+        float ledgerW = s1 * (1.0 - s2);
+        float reveal = max(passed * ledgerW, uReveal) * aFlag;
+        float beam = (1.0 - smoothstep(0.0, 0.28, abs(aP1.x - uScan))) * ledgerW;
+        vFlag = reveal; vBeam = beam;
+        vA = 0.5 + 0.5 * aRand;
+        vBoost = 1.0 + 0.9 * (1.0 - s1) + 0.35 * s3;
+        float size = uSize * (0.65 + aRand * 0.7) * (1.0 + reveal * 1.6 + beam * 1.2) * (1.0 + 0.35 * (1.0 - s1));
+        gl_PointSize = size * uPR * (11.0 / -mv.z);
+      }`,
+    fragmentShader: /* glsl */`
+      varying float vFlag; varying float vBeam; varying float vA; varying float vBoost;
+      void main(){
+        float d = length(gl_PointCoord - 0.5);
+        float a = smoothstep(0.5, 0.05, d);
+        vec3 base = vec3(0.84, 0.86, 0.90);
+        vec3 amber = vec3(1.0, 0.66, 0.16);
+        vec3 col = mix(base, amber, vFlag) + vBeam * vec3(0.45, 0.6, 0.85);
+        float alpha = a * vA * vBoost * (0.62 + vFlag * 0.9 + vBeam * 0.8);
+        gl_FragColor = vec4(col, alpha);
+      }`
+  });
+  const points = new THREE.Points(geo, mat);
+  const group = new THREE.Group();
+  group.add(points);
+  scene.add(group);
+
+  /* scan beam: a thin glowing bar laid on the ledger plane */
+  const beamGroup = new THREE.Group();
+  beamGroup.rotation.x = tilt1;
+  const beamMat = new THREE.MeshBasicMaterial({ color: 0x8ea6c8, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+  const beam = new THREE.Mesh(new THREE.PlaneGeometry(0.018, ledgerH * 1.12), beamMat);
+  const haloMat = beamMat.clone();
+  const halo = new THREE.Mesh(new THREE.PlaneGeometry(0.34, ledgerH * 1.12), haloMat);
+  beamGroup.add(halo, beam);
+  group.add(beamGroup);
 
   /* sizing */
-  let fit = 1;
+  let aspect = 1;
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     if (!w || !h) return;
     renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    fit = clamp(camera.aspect / 0.78, 0.6, 1);
+    aspect = w / h;
+    camera.aspect = aspect; camera.updateProjectionMatrix();
+    uniforms.uPR.value = renderer.getPixelRatio();
   }
   new ResizeObserver(resize).observe(canvas);
   resize();
 
   const clock = new THREE.Clock();
-  const tmp = new THREE.Vector3();
-  let gy = -0.36, mxs = 0, mys = 0, first = true;
+  const v = new THREE.Vector3();
+  let mx = 0, my = 0, gx = 0, gy = 0, gs = 1, ry = 0, first = true;
 
   function frame() {
     requestAnimationFrame(frame);
     const dt = Math.min(clock.getDelta(), 0.05);
     if (!S.visible && !first) return;
-    const seg = S.seg, sx = S.rtl ? 1 : -1;
     const t = clock.elapsedTime;
-    const k = 1 - Math.pow(0.001, dt);   // frame-rate independent smoothing
+    const k = 1 - Math.pow(0.0015, dt);
+    const p = S.seg;
+    const dir = S.rtl ? -1 : 1;
 
-    const storyW = smooth(seg) * (1 - smooth(seg - 3));
-    const finalW = smooth(seg - 3);
+    uniforms.uP.value = p;
+    uniforms.uTime.value = reduce ? 0 : t;
+    uniforms.uDir.value = dir;
 
-    rings.forEach((m, i) => {
-      const u = m.userData;
-      const focusW = smooth(1 - Math.abs(seg - (i + 1)));
-      const spin = reduce ? 0 : (1 - finalW) * (1 - focusW * 0.8);
-      u.phase[0] += dt * SPEED[i][0] * spin;
-      u.phase[1] += dt * SPEED[i][1] * spin;
+    // scan sweeps across the ledger in reading direction
+    const scanT = clamp((p - 0.82) / 0.55);
+    const half = ledgerW / 2 + 0.3;
+    uniforms.uScan.value = dir > 0 ? lerp(-half, half, scanT) : lerp(half, -half, scanT);
+    uniforms.uReveal.value = smooth((p - 1.35) / 0.3);
+    const ledgerW8 = smooth((p - 0.7) / 0.2) * (1 - smooth((p - 1.4) / 0.2));
+    beamGroup.position.x = uniforms.uScan.value;
+    beamMat.opacity = ledgerW8 * 0.9 * (scanT > 0 && scanT < 1 ? 1 : 0.15);
+    haloMat.opacity = beamMat.opacity * 0.12;
+    S.scanT = scanT;
 
-      const gyroW = clamp(1 - focusW - finalW);
-      const gx = wrapHalfPi(BASE[i][0] + u.phase[0]);
-      const gyy = wrapHalfPi(BASE[i][1] + u.phase[1]);
-      const fx = 0.32 + Math.sin(t * 0.8) * 0.05, fy = sx * 0.42 + Math.cos(t * 0.6) * 0.05;
-      const rx = gyroW * gx + focusW * fx;
-      const ry = gyroW * gyy + focusW * fy;
-      u.rot[0] = lerp(u.rot[0], rx, k * 0.35);
-      u.rot[1] = lerp(u.rot[1], ry, k * 0.35);
-      m.rotation.set(u.rot[0], u.rot[1], 0);
+    // framing per state
+    const wHero = 1 - smooth(p / 0.8);
+    const wFlat = smooth((p - 0.5) / 0.6) * (1 - smooth((p - 2.4) / 0.5));   // ledger + benford
+    const visW = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * aspect;
+    const wideFit = Math.min(1, (visW * 0.9) / Math.max(ledgerW, 9 * BAR_GAP + BW));
+    const roundFit = Math.min(1, (visW * 0.95) / 6.2);
+    const fit = lerp(roundFit, wideFit, wFlat);
+    const heroX = aspect > 1.1 ? dir * 2.4 : 0; // cloud sits opposite the headline
+    const tx = heroX * wHero;
+    const TY = aspect < 0.8 ? [1.6, 1.0, -0.45, 0.95] : [0.55, 0.7, -0.35, 0.62];
+    const si = Math.min(2, Math.floor(clamp(p, 0, 2.999))), sf = smooth(p - si);
+    const ty = lerp(TY[si], TY[si + 1], sf);
+    gx = lerp(gx, tx, k * 0.25); gy = lerp(gy, ty, k * 0.25); gs = lerp(gs, fit, k * 0.25);
+    group.position.set(gx, gy, 0);
+    group.scale.setScalar(gs);
 
-      // position & scale
-      // story = a carousel of rings: the focused one centred in front, the others slide aside
-      const f = clamp(seg - 1, 0, 2);
-      const off = i - f;
-      tmp.set(sx * off * 2.5 * fit, 0, -2.2 * Math.min(1, Math.abs(off)) + 0.6 * focusW);
-      tmp.multiplyScalar(storyW);
-      u.pos.lerp(tmp, k * 0.3);
-      m.position.copy(u.pos);
-      const sc = lerp(1, lerp(0.55, (0.9 * R[0]) / R[i], focusW), storyW);
-      u.scale = lerp(u.scale, sc, k * 0.3);
-      m.scale.setScalar(u.scale);
-      m.material.emissiveIntensity = lerp(m.material.emissiveIntensity, 0.32 * focusW * storyW, k * 0.3);
-    });
+    const wSphere = smooth(p - 2.2);
+    ry = lerp(ry, (reduce ? 0 : t * 0.12) * wSphere, k * 0.2);
+    mx = lerp(mx, S.mx, k * 0.12); my = lerp(my, S.my, k * 0.12);
+    group.rotation.set(my * 0.1 + wSphere * 0.15, mx * 0.22 * (1 - wFlat * 0.6) + ry, 0);
 
-    // core and glow
-    const coreS = lerp(1, 0.25, storyW) * (1 + Math.sin(t * 2) * 0.04);
-    core.scale.setScalar(coreS);
-    glow.scale.setScalar(lerp(2.6, 1.2, storyW) * (1 + finalW * 0.6) * (1 + Math.sin(t * 2) * 0.05));
-    glow.material.opacity = lerp(1, 0.35, storyW);
-    coreLight.intensity = lerp(6, 2, storyW) + finalW * 4;
-
-    // group placement
-    gy = lerp(gy, lerp(-0.36, 0.5, smooth(seg)), k * 0.3);
-    group.position.y = gy;
-    group.scale.setScalar(fit * lerp(0.74, 1, smooth(seg)));
-
-    // pointer parallax
-    mxs = lerp(mxs, S.mx, k * 0.15); mys = lerp(mys, S.my, k * 0.15);
-    world.rotation.y = mxs * 0.28;
-    world.rotation.x = mys * 0.16;
-    if (!reduce) dust.rotation.y = t * 0.015 + S.p * 1.4;
-    dust.position.y = S.p * 1.2;
-    camera.position.z = lerp(9, 8.3, finalW);
+    // Benford digit labels follow the bars on screen
+    const wBen = smooth((p - 1.6) / 0.3) * (1 - smooth((p - 2.4) / 0.25));
+    S.benfordW = wBen;
+    if (S.onBenford && wBen > 0.01) {
+      group.updateMatrixWorld();
+      const pts = S.barTops.map(bx => {
+        v.set(bx, S.barBase - 0.28, 0.3).applyMatrix4(group.matrixWorld).project(camera);
+        return [(v.x * 0.5 + 0.5) * canvas.clientWidth, (-v.y * 0.5 + 0.5) * canvas.clientHeight];
+      });
+      S.onBenford(pts, wBen);
+    } else if (S.onBenford) S.onBenford(null, 0);
 
     renderer.render(scene, camera);
     if (first) { first = false; canvas.classList.add("ready"); }

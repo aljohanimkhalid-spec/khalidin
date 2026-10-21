@@ -4,318 +4,363 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>خالد | مدقق داخلي أول</title>
-  <meta name="description" content="خالد، مدقق داخلي أول متخصص في التدقيق القائم على المخاطر والحوكمة والامتثال، ورحلته نحو شهادة CIA.">
-  <meta name="theme-color" content="#000000">
+  <meta name="description" content="خالد، مدقق داخلي أول. تدقيق قائم على المخاطر مدعوم بتحليل البيانات والأتمتة، ورحلة نحو شهادة CIA.">
+  <meta name="theme-color" content="#07080a">
   <meta property="og:title" content="Khalid | خالد">
-  <meta property="og:description" content="Senior Internal Auditor · GRC · The road to CIA">
+  <meta property="og:description" content="Senior Internal Auditor · Data analytics & automation · The road to CIA">
   <meta property="og:type" content="website">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <script type="importmap">{ "imports": { "three": "./assets/vendor/three.module.min.js" } }</script>
 </head>
 <body>
 
-<!-- ================= NAV ================= -->
+<!-- ============ NAV ============ -->
 <header class="nav" id="nav">
   <div class="nav-inner">
-    <a href="#top" class="brand" data-i18n="brand">خالد<span class="dot">.</span></a>
+    <a href="#top" class="brand"><span data-i18n="brand">خالد</span><i class="tick">✓</i></a>
     <nav class="nav-links" id="navLinks" aria-label="Main">
-      <a href="#journey" data-i18n="nav.journey">الرحلة</a>
-      <a href="#certs" data-i18n="nav.certs">الشهادات</a>
-      <a href="#expertise" data-i18n="nav.expertise">التخصص</a>
+      <a href="#analytics" data-i18n="nav.analytics">التحليل والأتمتة</a>
+      <a href="#cia" data-i18n="nav.cia">رحلة CIA</a>
+      <a href="#credentials" data-i18n="nav.credentials">الشهادات</a>
+      <a href="#cycles" data-i18n="nav.cycles">التخصص</a>
       <a href="#experience" data-i18n="nav.experience">الخبرة</a>
-      <a href="#projects" data-i18n="nav.projects">المشاريع</a>
     </nav>
     <button class="lang" id="langBtn" type="button" aria-label="Switch language"><span data-i18n="lang">EN</span></button>
     <a href="#contact" class="nav-cta" data-i18n="nav.contact">تواصل</a>
-    <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span></button>
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span></button>
   </div>
 </header>
 
 <main>
 
-<!-- ================= STAGE (3D hero + scroll story) ================= -->
-<section class="stage" id="top">
+<!-- ============ STAGE: a live audit of 12,480 transactions ============ -->
+<section class="stage" id="top" aria-label="Intro">
   <div class="stage-sticky">
     <canvas id="gl" aria-hidden="true"></canvas>
-    <div class="orb-fallback" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="benford-axis" id="benfordAxis" aria-hidden="true"></div>
+
+    <div class="hud" id="hud" aria-hidden="true">
+      <div class="hud-row"><span data-i18n="hud.pop">المجتمع</span><b class="mono" id="hudPop">12,480</b></div>
+      <div class="hud-row"><span data-i18n="hud.tested">تم فحصه</span><b class="mono" id="hudTested">0</b></div>
+      <div class="hud-row amber"><span data-i18n="hud.exc">استثناءات</span><b class="mono" id="hudExc">0</b></div>
+      <div class="hud-bar"><i id="hudBar"></i></div>
+    </div>
 
     <div class="layer layer-hero" data-layer="0">
-      <p class="eyebrow" data-i18n="hero.eyebrow">مدقق داخلي أول</p>
-      <h1 class="hero-title" data-i18n="hero.title">خالد<span class="dot">.</span></h1>
-      <p class="hero-tag grad-text" data-i18n="hero.tag">الرقابة. بمستوى جديد.</p>
-    </div>
-    <div class="layer layer-hero-bottom" data-layer="0">
-      <p class="hero-sub" data-i18n="hero.sub">تدقيق قائم على المخاطر، يمنح المؤسسات الثقة لتتحرك أسرع.</p>
+      <p class="kicker mono" data-i18n="hero.kicker">مدقق داخلي أول · الرياض</p>
+      <h1 class="hero-name" data-i18n="hero.name">خالد.</h1>
+      <p class="hero-thesis" data-i18n="hero.thesis">أدقق المجتمع كاملًا،<br><span class="amber-text">لا العينة فقط.</span></p>
+      <p class="hero-sub" data-i18n="hero.sub">تدقيق قائم على المخاطر، مدعوم بتحليل البيانات والأتمتة.</p>
       <div class="hero-actions">
-        <a href="#contact" class="btn btn-primary" data-i18n="hero.cta">تواصل معي</a>
-        <a href="#journey" class="btn-link" data-i18n="hero.link">تابع الرحلة ‹</a>
+        <a href="#analytics" class="btn btn-amber" data-i18n="hero.cta">شاهد كيف أعمل</a>
+        <a href="#contact" class="btn btn-line" data-i18n="hero.cta2">تواصل معي</a>
       </div>
     </div>
 
     <div class="layer layer-story" data-layer="1">
-      <p class="story-k c1" data-i18n="s1.k">الحوكمة</p>
-      <h2 class="story-t" data-i18n="s1.t">وضوح في كل قرار.</h2>
+      <p class="kicker mono" data-i18n="s1.k">01 · اختبار المجتمع</p>
+      <h2 class="story-t" data-i18n="s1.t">كل معاملة. تُفحص.</h2>
+      <p class="story-d" data-i18n="s1.d">بدل عينة من 25 قيدًا، أختبر كل القيود بقواعد مكتوبة مرة واحدة. الاستثناءات تظهر وحدها.</p>
     </div>
-    <div class="layer layer-story" data-layer="2">
-      <p class="story-k c2" data-i18n="s2.k">المخاطر</p>
-      <h2 class="story-t" data-i18n="s2.t">أرى ما قد يفوت الآخرين.</h2>
+    <div class="layer layer-story layer-top" data-layer="2">
+      <p class="kicker mono" data-i18n="s2.k">02 · قانون بنفورد</p>
+      <h2 class="story-t" data-i18n="s2.t">الأرقام تكشف ما لا يُقال.</h2>
+      <p class="story-d" data-i18n="s2.d">في البيانات الطبيعية، يبدأ 30٪ من المبالغ بالرقم 1. أي انحراف عن هذا التوزيع يستحق سؤالًا.</p>
     </div>
     <div class="layer layer-story" data-layer="3">
-      <p class="story-k c3" data-i18n="s3.k">الامتثال</p>
-      <h2 class="story-t" data-i18n="s3.t">قواعد تُحترم. دائمًا.</h2>
-    </div>
-    <div class="layer layer-story" data-layer="4">
-      <p class="story-k grad-text" data-i18n="s4.k">GRC</p>
-      <h2 class="story-t" data-i18n="s4.t">ثلاث حلقات. رؤية واحدة متكاملة.</h2>
+      <p class="kicker mono" data-i18n="s3.k">03 · التأكيد</p>
+      <h2 class="story-t" data-i18n="s3.t">من البيانات، إلى الثقة.</h2>
+      <p class="story-d" data-i18n="s3.d">النتيجة رأي مبني على الدليل، وإدارة تعرف بالضبط أين تقف.</p>
     </div>
 
-    <div class="stage-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="stage-progress" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   </div>
 </section>
 
-<!-- ================= CIA JOURNEY ================= -->
-<section class="journey dark" id="journey">
-  <div class="container">
-    <p class="eyebrow latin reveal">Certified Internal Auditor</p>
-    <h2 class="title reveal" data-i18n="j.title">رحلتي نحو <span class="grad-text">CIA</span>.</h2>
-    <p class="sub reveal" data-i18n="j.sub">الشهادة الأرفع عالميًا في التدقيق الداخلي، من معهد المدققين الداخليين IIA. ثلاثة أجزاء، وخطوة بخطوة.</p>
+<!-- ============ ANALYTICS & AUTOMATION ============ -->
+<section class="analytics" id="analytics">
+  <div class="wrap">
+    <header class="sec-head reveal">
+      <p class="kicker mono" data-i18n="a.k">الأتمتة وتحليل البيانات</p>
+      <h2 class="sec-title" data-i18n="a.t">أكتب الاختبار مرة واحدة.<br><span class="dim">ويعمل على كل معاملة.</span></h2>
+      <p class="sec-sub" data-i18n="a.s">أحوّل إجراءات التدقيق المتكررة إلى اختبارات آلية بلغة Python و SQL، تعمل على بيانات النظام مباشرة وتسلّم الاستثناءات جاهزة للمتابعة.</p>
+    </header>
 
-    <div class="journey-grid">
-      <div class="ring-card tilt reveal">
-        <svg class="ring" viewBox="0 0 220 220" aria-hidden="true">
-          <defs>
-            <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#5eead4"/><stop offset="55%" stop-color="#6d8dff"/><stop offset="100%" stop-color="#b58cff"/>
-            </linearGradient>
-          </defs>
-          <circle class="ring-bg" cx="110" cy="110" r="92"/>
-          <circle class="ring-fg" id="ringFg" cx="110" cy="110" r="92"/>
-        </svg>
-        <div class="ring-center">
-          <div class="ring-num"><span id="partsDone">0</span><small>/3</small></div>
-          <div class="ring-label" data-i18n="j.ring">أجزاء مكتملة</div>
+    <div class="console reveal" id="console">
+      <div class="tests" role="tablist" aria-label="Analytics tests">
+        <button class="test on" role="tab" aria-selected="true" data-test="dup"><span class="t-ix mono">T-01</span><span data-i18n="t1">المدفوعات المكررة</span></button>
+        <button class="test" role="tab" aria-selected="false" data-test="benford"><span class="t-ix mono">T-02</span><span data-i18n="t2">تحليل بنفورد</span></button>
+        <button class="test" role="tab" aria-selected="false" data-test="match"><span class="t-ix mono">T-03</span><span data-i18n="t3">المطابقة الثلاثية</span></button>
+        <button class="test" role="tab" aria-selected="false" data-test="sod"><span class="t-ix mono">T-04</span><span data-i18n="t4">فصل المهام</span></button>
+      </div>
+
+      <div class="panel" role="tabpanel">
+        <div class="panel-bar mono">
+          <span class="file" id="pFile">tests/duplicate_payments.py</span>
+          <span class="run" id="pRun"><i></i><span data-i18n="c.run">يعمل</span></span>
         </div>
-        <span class="glare"></span>
+        <pre class="code mono" dir="ltr"><code id="pCode"></code></pre>
+        <div class="result">
+          <div class="metrics">
+            <div class="metric"><span data-i18n="c.scanned">سجلات مفحوصة</span><b class="mono" id="mScanned">0</b></div>
+            <div class="metric amber"><span data-i18n="c.exceptions">استثناءات</span><b class="mono" id="mExc">0</b></div>
+            <div class="metric"><span data-i18n="c.coverage">نسبة التغطية</span><b class="mono">100%</b></div>
+          </div>
+          <div class="viz" id="pViz" dir="ltr"></div>
+          <p class="note mono" data-i18n="c.note">بيانات توضيحية لعرض المنهجية</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- pipeline -->
+    <div class="pipeline reveal">
+      <div class="pipe-line" aria-hidden="true"><i></i></div>
+      <div class="stage-card">
+        <span class="mono pix">01</span>
+        <h3 data-i18n="pl1">الاستخراج</h3>
+        <p class="mono">Oracle EBS · SAP · Odoo</p>
+      </div>
+      <div class="stage-card">
+        <span class="mono pix">02</span>
+        <h3 data-i18n="pl2">التهيئة</h3>
+        <p class="mono">Python · SQL · Power Query</p>
+      </div>
+      <div class="stage-card">
+        <span class="mono pix">03</span>
+        <h3 data-i18n="pl3">الاختبار</h3>
+        <p class="mono" data-i18n="pl3d">محرك قواعد · YAML</p>
+      </div>
+      <div class="stage-card">
+        <span class="mono pix">04</span>
+        <h3 data-i18n="pl4">التقرير</h3>
+        <p class="mono">Power BI · Tableau · TeamMate</p>
+      </div>
+    </div>
+
+    <!-- built tools -->
+    <h3 class="sub-head reveal" data-i18n="b.h">أدوات بنيتها</h3>
+    <div class="built">
+      <article class="tool reveal">
+        <p class="tool-meta mono">Python · YAML</p>
+        <h4>AuditFlow</h4>
+        <p data-i18n="b1">محرك قواعد لدورة المشتريات والدفع، يضم 34 قاعدة اختبار مكتوبة بصيغة YAML وقابلة للتوسعة.</p>
+        <span class="tool-big mono">34<small data-i18n="b1s">قاعدة</small></span>
+      </article>
+      <article class="tool reveal">
+        <p class="tool-meta mono">Python · Streamlit</p>
+        <h4 data-i18n="b2t">أداة أتمتة التدقيق</h4>
+        <p data-i18n="b2">واجهة تفاعلية ترفع بيانات النظام وتشغّل الاختبارات وتعرض الاستثناءات في دقائق بدل أيام.</p>
+        <span class="tool-big mono">ERP<small data-i18n="b2s">إلى تقرير</small></span>
+      </article>
+      <article class="tool reveal">
+        <p class="tool-meta mono">Excel · openpyxl</p>
+        <h4>Audit Engagement Kit</h4>
+        <p data-i18n="b3">التخطيط وأوراق العمل واختيار العينات في ملف واحد. تدخل المعطيات المهمة فقط، والباقي يُبنى تلقائيًا.</p>
+        <span class="tool-big mono">1<small data-i18n="b3s">ملف للمهمة كاملة</small></span>
+      </article>
+      <article class="tool reveal">
+        <p class="tool-meta mono">HTML · JS</p>
+        <h4 data-i18n="b4t">محاكي اختبار CIA</h4>
+        <p data-i18n="b4">125 سؤالًا تحاكي بيئة الاختبار، مع تصحيح فوري وشرح لكل إجابة، وأدلة مذاكرة ثنائية اللغة.</p>
+        <span class="tool-big mono">125<small data-i18n="b4s">سؤالًا</small></span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CIA ============ -->
+<section class="cia" id="cia">
+  <div class="wrap">
+    <header class="sec-head reveal">
+      <p class="kicker mono">Certified Internal Auditor</p>
+      <h2 class="sec-title" data-i18n="j.t">الطريق إلى <span class="amber-text">CIA</span>.</h2>
+      <p class="sec-sub" data-i18n="j.s">الشهادة الأرفع عالميًا في التدقيق الداخلي، من معهد المدققين الداخليين IIA. ثلاثة أجزاء، خطوة بخطوة.</p>
+    </header>
+
+    <div class="cia-grid">
+      <div class="ring-box reveal">
+        <svg class="ring" viewBox="0 0 240 240" aria-hidden="true">
+          <circle class="ring-track" cx="120" cy="120" r="100"/>
+          <circle class="ring-ticks" cx="120" cy="120" r="112"/>
+          <circle class="ring-fill" id="ringFill" cx="120" cy="120" r="100"/>
+        </svg>
+        <div class="ring-mid">
+          <b class="mono" dir="ltr"><span id="partsDone">0</span><small>/3</small></b>
+          <span data-i18n="j.ring">أجزاء مكتملة</span>
+        </div>
       </div>
 
       <ol class="parts" id="parts">
         <!-- data-status: done | progress | next -->
-        <li class="part tilt reveal" data-status="progress">
-          <span class="part-num latin">01</span>
-          <div><h3 data-i18n="j.p1">أساسيات التدقيق الداخلي</h3><p class="latin" data-i18n="j.p1s">Essentials of Internal Auditing</p></div>
-          <span class="pill"><span data-i18n="st.progress">قيد التحضير</span></span>
-          <span class="glare"></span>
+        <li class="part reveal" data-status="progress">
+          <span class="p-ix mono">P1</span>
+          <div class="p-txt"><h3 data-i18n="j.p1">أساسيات التدقيق الداخلي</h3><p data-i18n="j.p1s">Essentials of Internal Auditing</p></div>
+          <span class="p-state"><span data-i18n="st.progress">قيد التحضير</span></span>
         </li>
-        <li class="part tilt reveal" data-status="done">
-          <span class="part-num latin">02</span>
-          <div><h3 data-i18n="j.p2">ممارسة التدقيق الداخلي</h3><p class="latin" data-i18n="j.p2s">Practice of Internal Auditing</p></div>
-          <span class="pill"><span data-i18n="st.done">مكتمل</span></span>
-          <span class="glare"></span>
+        <li class="part reveal" data-status="done">
+          <span class="p-ix mono">P2</span>
+          <div class="p-txt"><h3 data-i18n="j.p2">ممارسة التدقيق الداخلي</h3><p data-i18n="j.p2s">Practice of Internal Auditing</p></div>
+          <span class="p-state"><span data-i18n="st.done">مكتمل</span></span>
         </li>
-        <li class="part tilt reveal" data-status="done">
-          <span class="part-num latin">03</span>
-          <div><h3 data-i18n="j.p3">المعرفة التجارية للتدقيق الداخلي</h3><p class="latin" data-i18n="j.p3s">Business Knowledge for Internal Auditing</p></div>
-          <span class="pill"><span data-i18n="st.done">مكتمل</span></span>
-          <span class="glare"></span>
+        <li class="part reveal" data-status="done">
+          <span class="p-ix mono">P3</span>
+          <div class="p-txt"><h3 data-i18n="j.p3">المعرفة التجارية للتدقيق الداخلي</h3><p data-i18n="j.p3s">Business Knowledge for Internal Auditing</p></div>
+          <span class="p-state"><span data-i18n="st.done">مكتمل</span></span>
         </li>
       </ol>
     </div>
+  </div>
+</section>
 
-    <div class="numbers">
-      <div class="num reveal"><span class="count latin" data-to="5">0</span><p data-i18n="n1">شهادات في الحوكمة والمخاطر</p></div>
-      <div class="num reveal"><span class="count latin" data-to="2">0</span><p data-i18n="n2">عضويات مهنية</p></div>
-      <div class="num reveal"><span class="count latin" data-to="4">0</span><p data-i18n="n3">دورات أعمال أدققها</p></div>
-      <div class="num reveal"><span class="count latin" data-to="125">0</span><p data-i18n="n4">سؤالًا في محاكي CIA</p></div>
+<!-- ============ CREDENTIALS ============ -->
+<section class="creds" id="credentials">
+  <div class="wrap">
+    <header class="sec-head reveal">
+      <p class="kicker mono" data-i18n="c.k">الشهادات والعضويات</p>
+      <h2 class="sec-title" data-i18n="c.t">معرفة معتمدة،<br><span class="dim">في كل زاوية من GRC.</span></h2>
+    </header>
+
+    <div class="ledger reveal" role="table" aria-label="Credentials">
+      <div class="l-row l-head mono" role="row">
+        <span role="columnheader" data-i18n="l.code">الرمز</span>
+        <span role="columnheader" data-i18n="l.name">الشهادة</span>
+        <span role="columnheader" data-i18n="l.issuer">الجهة</span>
+        <span role="columnheader" class="l-tick-h">✓</span>
+      </div>
+      <div class="l-row" role="row"><b class="l-code" role="cell">GRCP</b><span role="cell" data-i18n="cr1">محترف الحوكمة والمخاطر والامتثال</span><span class="mono l-iss" role="cell">OCEG</span><i class="l-tick" role="cell">✓</i></div>
+      <div class="l-row" role="row"><b class="l-code" role="cell">GRCA</b><span role="cell" data-i18n="cr2">مدقق الحوكمة والمخاطر والامتثال</span><span class="mono l-iss" role="cell">OCEG</span><i class="l-tick" role="cell">✓</i></div>
+      <div class="l-row" role="row"><b class="l-code" role="cell">IRMP</b><span role="cell" data-i18n="cr3">محترف إدارة المخاطر المتكاملة</span><span class="mono l-iss" role="cell">OCEG</span><i class="l-tick" role="cell">✓</i></div>
+      <div class="l-row" role="row"><b class="l-code" role="cell">IPMP</b><span role="cell" data-i18n="cr4">محترف إدارة السياسات المتكاملة</span><span class="mono l-iss" role="cell">OCEG</span><i class="l-tick" role="cell">✓</i></div>
+      <div class="l-row" role="row"><b class="l-code" role="cell">IAAP</b><span role="cell" data-i18n="cr5">محترف التدقيق والتأكيد المتكامل</span><span class="mono l-iss" role="cell">OCEG</span><i class="l-tick" role="cell">✓</i></div>
+      <div class="l-row l-member" role="row"><b class="l-code" role="cell">IIA</b><span role="cell" data-i18n="cr6">عضو معهد المدققين الداخليين</span><span class="mono l-iss" role="cell" data-i18n="l.member">عضوية</span><i class="l-tick" role="cell">✓</i></div>
+      <div class="l-row l-member" role="row"><b class="l-code" role="cell">SOCPA</b><span role="cell" data-i18n="cr7">عضو الهيئة السعودية للمراجعين والمحاسبين</span><span class="mono l-iss" role="cell" data-i18n="l.member">عضوية</span><i class="l-tick" role="cell">✓</i></div>
     </div>
   </div>
 </section>
 
-<!-- ================= CERTIFICATIONS ================= -->
-<section class="certs light" id="certs">
-  <div class="container">
-    <p class="eyebrow reveal" data-i18n="c.eyebrow">الشهادات</p>
-    <h2 class="title reveal" data-i18n="c.title">معرفة معتمدة.<br><span class="muted">في كل زاوية من GRC.</span></h2>
-    <p class="hint reveal" data-i18n="c.hint">مرّر المؤشر أو اضغط على البطاقة لقلبها</p>
-
-    <div class="flip-grid">
-      <button class="flip reveal" type="button"><span class="flip-inner">
-        <span class="face front"><span class="acr">GRCP</span><span class="issuer">OCEG</span></span>
-        <span class="face back"><b data-i18n="c1">محترف الحوكمة والمخاطر والامتثال</b><small data-i18n="c1s">GRC Professional</small></span>
-      </span></button>
-      <button class="flip reveal" type="button"><span class="flip-inner">
-        <span class="face front"><span class="acr">GRCA</span><span class="issuer">OCEG</span></span>
-        <span class="face back"><b data-i18n="c2">مدقق الحوكمة والمخاطر والامتثال</b><small data-i18n="c2s">GRC Audit</small></span>
-      </span></button>
-      <button class="flip reveal" type="button"><span class="flip-inner">
-        <span class="face front"><span class="acr">IRMP</span><span class="issuer">OCEG</span></span>
-        <span class="face back"><b data-i18n="c3">محترف إدارة المخاطر المتكاملة</b><small data-i18n="c3s">Integrated Risk Management Professional</small></span>
-      </span></button>
-      <button class="flip reveal" type="button"><span class="flip-inner">
-        <span class="face front"><span class="acr">IPMP</span><span class="issuer">OCEG</span></span>
-        <span class="face back"><b data-i18n="c4">محترف إدارة السياسات المتكاملة</b><small data-i18n="c4s">Integrated Policy Management Professional</small></span>
-      </span></button>
-      <button class="flip reveal" type="button"><span class="flip-inner">
-        <span class="face front"><span class="acr">IAAP</span><span class="issuer">OCEG</span></span>
-        <span class="face back"><b data-i18n="c5">محترف التدقيق والتأكيد المتكامل</b><small data-i18n="c5s">Integrated Audit &amp; Assurance Professional</small></span>
-      </span></button>
-      <div class="members reveal">
-        <p class="m-label" data-i18n="c.members">العضويات المهنية</p>
-        <div class="member"><span class="m-acr latin">IIA</span><span data-i18n="c.iia">معهد المدققين الداخليين</span></div>
-        <div class="member"><span class="m-acr latin">SOCPA</span><span data-i18n="c.socpa">الهيئة السعودية للمراجعين والمحاسبين</span></div>
-      </div>
+<!-- ============ AUDIT CYCLES ============ -->
+<section class="cycles" id="cycles">
+  <div class="wrap">
+    <header class="sec-head reveal">
+      <p class="kicker mono" data-i18n="cy.k">دورات الأعمال</p>
+      <h2 class="sec-title" data-i18n="cy.t">أين أصنع الفرق.</h2>
+    </header>
+    <div class="cycle-grid">
+      <article class="cycle reveal">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 11h5l5 21h19l4-14H14"/><circle cx="19" cy="38" r="2.5"/><circle cx="33" cy="38" r="2.5"/></svg>
+        <h3 data-i18n="cy1">المشتريات والدفع</h3>
+        <p data-i18n="cy1d">كل ريال يُصرف بصلاحية واضحة ومستند سليم.</p>
+        <ul class="chips" data-i18n="cy1c"><li>المطابقة الثلاثية</li><li>بيانات الموردين</li><li>تجزئة أوامر الشراء</li></ul>
+      </article>
+      <article class="cycle reveal">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 36l11-11 7 7 15-15"/><path d="M31 17h9v9"/></svg>
+        <h3 data-i18n="cy2">المبيعات والتسويق</h3>
+        <p data-i18n="cy2d">إيراد محمي من التسرب، من التسعير حتى التحصيل.</p>
+        <ul class="chips" data-i18n="cy2c"><li>حدود الائتمان</li><li>الخصومات</li><li>أعمار الديون</li></ul>
+      </article>
+      <article class="cycle reveal">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="18" cy="17" r="6"/><path d="M6 38c1-7 6-11 12-11s11 4 12 11"/><circle cx="34" cy="19" r="4.5"/><path d="M31 28c5 0 10 3 11 10"/></svg>
+        <h3 data-i18n="cy3">الموارد البشرية والرواتب</h3>
+        <p data-i18n="cy3d">عدالة بدقة الأرقام، من التعيين حتى نهاية الخدمة.</p>
+        <ul class="chips" data-i18n="cy3c"><li>الموظفون الوهميون</li><li>صلاحيات النظام</li><li>تسويات الرواتب</li></ul>
+      </article>
+      <article class="cycle reveal">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6l15 6v11c0 9-6 16-15 19C15 39 9 32 9 23V12z"/><path d="M17 24l5 5 9-10"/></svg>
+        <h3 data-i18n="cy4">الصحة والسلامة والبيئة</h3>
+        <p data-i18n="cy4d">رقابة تحمي الإنسان أولًا، ثم المنشأة والسمعة.</p>
+        <ul class="chips" data-i18n="cy4c"><li>بلاغات الحوادث</li><li>تصاريح العمل</li><li>الامتثال البيئي</li></ul>
+      </article>
     </div>
   </div>
 </section>
 
-<!-- ================= EXPERTISE (carousel) ================= -->
-<section class="expertise dark" id="expertise">
-  <div class="container">
-    <div class="head-row">
-      <div>
-        <p class="eyebrow reveal" data-i18n="e.eyebrow">مجالات التخصص</p>
-        <h2 class="title reveal" data-i18n="e.title">أين أصنع الفرق.</h2>
+<!-- ============ EXPERIENCE (a workpaper) ============ -->
+<section class="experience" id="experience">
+  <div class="wrap">
+    <div class="wp reveal">
+      <div class="wp-head mono">
+        <span><em data-i18n="wp.ref">مرجع ورقة العمل</em> C-1</span>
+        <span><em data-i18n="wp.prep">أعدّها</em> <b data-i18n="brand">خالد</b></span>
+        <span><em data-i18n="wp.rev">الحالة</em> <b class="pen">✓ <span data-i18n="wp.ok">تمت المراجعة</span></b></span>
       </div>
-      <div class="car-btns">
-        <button type="button" class="car-btn" id="carPrev" aria-label="Previous">‹</button>
-        <button type="button" class="car-btn" id="carNext" aria-label="Next">›</button>
-      </div>
-    </div>
-  </div>
-  <div class="carousel" id="carousel">
-    <article class="ex-card ex1">
-      <div class="ex-art"><svg viewBox="0 0 120 120"><defs><linearGradient id="eg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5eead4"/><stop offset="1" stop-color="#6d8dff"/></linearGradient></defs><path d="M18 30h12l12 52h48l10-36H36" stroke="url(#eg1)"/><circle cx="48" cy="96" r="6" stroke="url(#eg1)"/><circle cx="84" cy="96" r="6" stroke="url(#eg1)"/></svg></div>
-      <p class="ex-k" data-i18n="e1.k">المشتريات والدفع</p>
-      <h3 data-i18n="e1.t">كل ريال، بضوابطه.</h3>
-      <p class="ex-d" data-i18n="e1.d">من طلب الشراء حتى السداد، أتحقق أن الصرف يتم بصلاحيات واضحة ومستندات سليمة.</p>
-    </article>
-    <article class="ex-card ex2">
-      <div class="ex-art"><svg viewBox="0 0 120 120"><defs><linearGradient id="eg2" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#6d8dff"/><stop offset="1" stop-color="#b58cff"/></linearGradient></defs><path d="M16 92l28-28 18 18 42-42" stroke="url(#eg2)"/><path d="M78 40h26v26" stroke="url(#eg2)"/></svg></div>
-      <p class="ex-k" data-i18n="e2.k">المبيعات والتسويق</p>
-      <h3 data-i18n="e2.t">إيراد محمي من التسرب.</h3>
-      <p class="ex-d" data-i18n="e2.d">التسعير والخصومات والتحصيل، تحت رقابة تكشف الثغرات قبل أن تكلّف.</p>
-    </article>
-    <article class="ex-card ex3">
-      <div class="ex-art"><svg viewBox="0 0 120 120"><defs><linearGradient id="eg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b58cff"/><stop offset="1" stop-color="#f0abfc"/></linearGradient></defs><circle cx="46" cy="42" r="15" stroke="url(#eg3)"/><path d="M16 100c3-18 15-28 30-28s27 10 30 28" stroke="url(#eg3)"/><circle cx="86" cy="48" r="11" stroke="url(#eg3)"/><path d="M80 72c13 0 23 9 26 28" stroke="url(#eg3)"/></svg></div>
-      <p class="ex-k" data-i18n="e3.k">الموارد البشرية والرواتب</p>
-      <h3 data-i18n="e3.t">عدالة بدقة الأرقام.</h3>
-      <p class="ex-d" data-i18n="e3.d">دقة الرواتب، صلاحيات الأنظمة، ونزاهة الإجراءات من التعيين حتى نهاية الخدمة.</p>
-    </article>
-    <article class="ex-card ex4">
-      <div class="ex-art"><svg viewBox="0 0 120 120"><defs><linearGradient id="eg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fcd34d"/><stop offset="1" stop-color="#5eead4"/></linearGradient></defs><path d="M60 14l36 14v26c0 22-15 40-36 48C39 94 24 76 24 54V28z" stroke="url(#eg4)"/><path d="M44 60l12 12 22-24" stroke="url(#eg4)"/></svg></div>
-      <p class="ex-k" data-i18n="e4.k">الصحة والسلامة والبيئة</p>
-      <h3 data-i18n="e4.t">الإنسان أولًا.</h3>
-      <p class="ex-d" data-i18n="e4.d">رقابة تحمي الأرواح أولًا، ثم المنشأة والسمعة والبيئة من حولها.</p>
-    </article>
-  </div>
-</section>
+      <h2 class="sec-title" data-i18n="x.t">مسيرة تُبنى بثبات.</h2>
 
-<!-- ================= EXPERIENCE ================= -->
-<section class="experience white" id="experience">
-  <div class="container narrow">
-    <p class="eyebrow reveal" data-i18n="x.eyebrow">الخبرة</p>
-    <h2 class="title reveal" data-i18n="x.title">مسيرة تُبنى بثبات.</h2>
-    <div class="timeline" id="timeline">
-      <span class="t-line"><i id="tFill"></i></span>
-      <div class="t-item current reveal">
-        <span class="t-dot"></span>
-        <div class="t-head"><h3 data-i18n="x1.n">مجموعة الخريف</h3><span class="badge" data-i18n="x.now">حاليًا</span></div>
-        <p class="t-role" data-i18n="x1.r">مدقق داخلي أول · الخدمات المشتركة، الرياض</p>
-        <p class="t-desc" data-i18n="x1.d">مهام تدقيق قائمة على المخاطر عبر شركات المجموعة، تشمل المشتريات والمبيعات والموارد البشرية والصحة والسلامة.</p>
-      </div>
-      <div class="t-item reveal">
-        <span class="t-dot"></span>
-        <div class="t-head"><h3 data-i18n="x2.n">شركة MHR القابضة</h3></div>
-        <p class="t-role" data-i18n="x2.r">التدقيق الداخلي</p>
-      </div>
-      <div class="t-item reveal">
-        <span class="t-dot"></span>
-        <div class="t-head"><h3 data-i18n="x3.n">عيادة الأصابع الذهبية البيطرية</h3></div>
-        <p class="t-role" data-i18n="x3.r">مدقق داخلي</p>
-      </div>
-      <div class="t-item reveal">
-        <span class="t-dot"></span>
-        <div class="t-head"><h3 data-i18n="x4.n">شركة ينبع المتحدة (YUNIGREEN)</h3></div>
-        <p class="t-role" data-i18n="x4.r">مدقق داخلي مشارك · ينبع</p>
-        <p class="t-desc" data-i18n="x4.d">حيث بدأت القصة.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= PROJECTS (3D device) ================= -->
-<section class="projects light" id="projects">
-  <div class="container">
-    <p class="eyebrow reveal" data-i18n="p.eyebrow">ما أبنيه</p>
-    <h2 class="title reveal" data-i18n="p.title">أدوات تحوّل المعرفة<br><span class="muted">إلى عمل.</span></h2>
-
-    <div class="proj-wrap">
-      <div class="device-stage" id="deviceStage">
-        <div class="device" id="device">
-          <div class="screen">
-            <div class="q-top"><span data-i18n="q.count">سؤال 37 من 125</span><span class="q-bar"><i></i></span></div>
-            <p class="q-q" data-i18n="q.q">ما الهدف الأساسي من تقييم المخاطر عند تخطيط المهمة؟</p>
-            <div class="q-opt" data-i18n="q.a">تحديد النطاق حسب الأهمية النسبية</div>
-            <div class="q-opt ok" data-i18n="q.b">توجيه الموارد نحو المخاطر الأعلى</div>
-            <div class="q-opt" data-i18n="q.c">تقليل عدد العينات</div>
-            <div class="q-exp"><b data-i18n="q.ok">إجابة صحيحة</b><span data-i18n="q.why">تقييم المخاطر يوجّه خطة المهمة نحو ما يهم أكثر.</span></div>
-            <div class="q-foot"><span class="q-score latin">36 / 37</span><span class="q-btn" data-i18n="q.next">التالي</span></div>
+      <div class="tl" id="tl">
+        <span class="tl-line"><i id="tlFill"></i></span>
+        <div class="tl-item now reveal">
+          <span class="tl-ref mono">C-1.1</span>
+          <div>
+            <div class="tl-head"><h3 data-i18n="x1n">مجموعة الخريف</h3><span class="badge" data-i18n="x.now">حاليًا</span></div>
+            <p class="tl-role" data-i18n="x1r">مدقق داخلي أول · الخدمات المشتركة، الرياض</p>
+            <p class="tl-desc" data-i18n="x1d">مهام تدقيق قائمة على المخاطر عبر شركات المجموعة، تغطي المشتريات والمبيعات والموارد البشرية والصحة والسلامة، باستخدام بيانات Oracle EBS.</p>
           </div>
-          <span class="notch"></span>
         </div>
-        <div class="device-shadow"></div>
-      </div>
-
-      <div class="proj-list">
-        <article class="proj reveal">
-          <span class="proj-i latin">01</span>
-          <h3 data-i18n="p1.t">محاكي اختبار CIA</h3>
-          <p data-i18n="p1.d">125 سؤالًا تحاكي بيئة الاختبار الحقيقية، مع تصحيح فوري وشرح لكل إجابة.</p>
-        </article>
-        <article class="proj reveal">
-          <span class="proj-i latin">02</span>
-          <h3 data-i18n="p2.t">أدلة مذاكرة ثنائية اللغة</h3>
-          <p data-i18n="p2.d">شروحات عربية وإنجليزية جنبًا إلى جنب، وبطاقات لمفاهيم الاحتيال وقواعد التمييز.</p>
-        </article>
-        <article class="proj reveal">
-          <span class="proj-i latin">03</span>
-          <h3>Audit Engagement Kit</h3>
-          <p data-i18n="p3.d">مشروع شخصي يجمع التخطيط واختيار العينات والاختبارات في مكان واحد.</p>
-          <div class="flow"><span data-i18n="f1">التخطيط</span><span data-i18n="f2">العينات</span><span data-i18n="f3">الاختبار</span><span data-i18n="f4">التقرير</span></div>
-        </article>
+        <div class="tl-item reveal">
+          <span class="tl-ref mono">C-1.2</span>
+          <div>
+            <div class="tl-head"><h3 data-i18n="x2n">شركة MHR القابضة</h3></div>
+            <p class="tl-role" data-i18n="x2r">التدقيق الداخلي</p>
+            <p class="tl-desc" data-i18n="x2d">تدقيق دورتي المشتريات والمبيعات على بيانات Odoo، وبناء أداة أتمتة للتدقيق بلغة Python و Streamlit.</p>
+          </div>
+        </div>
+        <div class="tl-item reveal">
+          <span class="tl-ref mono">C-1.3</span>
+          <div>
+            <div class="tl-head"><h3 data-i18n="x3n">عيادة الأصابع الذهبية البيطرية</h3></div>
+            <p class="tl-role" data-i18n="x3r">مدقق داخلي</p>
+          </div>
+        </div>
+        <div class="tl-item reveal">
+          <span class="tl-ref mono">C-1.4</span>
+          <div>
+            <div class="tl-head"><h3 data-i18n="x4n">شركة ينبع المتحدة (YUNIGREEN)</h3></div>
+            <p class="tl-role" data-i18n="x4r">مدقق داخلي مشارك · ينبع</p>
+            <p class="tl-desc" data-i18n="x4d">حيث بدأت القصة.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= CONTACT ================= -->
-<section class="contact dark" id="contact">
-  <div class="contact-glow" aria-hidden="true"></div>
-  <div class="container contact-inner">
-    <h2 class="contact-title reveal" data-i18n="ct.title">لنصنع رقابة<br><span class="grad-text">تصنع الفرق.</span></h2>
-    <p class="sub reveal" data-i18n="ct.sub">لفرص العمل والتعاون، أو للحديث عن التدقيق ورحلة CIA.</p>
+<!-- ============ CONTACT (sign-off) ============ -->
+<section class="contact" id="contact">
+  <div class="wrap contact-inner">
+    <p class="kicker mono reveal" data-i18n="ct.k">الختام والاعتماد</p>
+    <h2 class="contact-title reveal" data-i18n="ct.t">لنبدأ المهمة<br><span class="amber-text">التالية.</span></h2>
+    <p class="sec-sub reveal" data-i18n="ct.s">لفرص العمل والتعاون، أو للحديث عن التدقيق المبني على البيانات ورحلة CIA.</p>
     <div class="contact-actions reveal">
       <!-- ضع الروابط في href. أي زر بدون رابط يُخفى تلقائيًا -->
-      <a class="btn btn-light" data-link href="" target="_blank" rel="noopener">LinkedIn</a>
-      <a class="btn btn-ghost" data-link href="" data-i18n="ct.email">البريد الإلكتروني</a>
-      <a class="btn btn-ghost" data-link href="" target="_blank" rel="noopener">CIA Cert Journey</a>
+      <a class="btn btn-amber" data-link href="" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn btn-line" data-link href="" data-i18n="ct.email">البريد الإلكتروني</a>
+      <a class="btn btn-line" data-link href="" target="_blank" rel="noopener">CIA Cert Journey</a>
+    </div>
+    <div class="stamp reveal" aria-hidden="true">
+      <svg viewBox="0 0 200 200" direction="ltr">
+        <defs><path id="stampPath" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs>
+        <circle class="st-o" cx="100" cy="100" r="94"/>
+        <circle class="st-i" cx="100" cy="100" r="56"/>
+        <g class="st-ring"><text><textPath href="#stampPath" textLength="458" lengthAdjust="spacing">PREPARED · REVIEWED · APPROVED · KHALIDIN.COM ·</textPath></text></g>
+        <text class="st-c" x="100" y="119" text-anchor="middle">✓</text>
+      </svg>
+      <p class="sign-line"><span data-i18n="ct.prep">أعدّها: خالد · الرياض</span> · <span id="year">2026</span></p>
     </div>
   </div>
 </section>
 </main>
 
 <footer class="footer">
-  <div class="container footer-inner">
-    <a href="#top" class="f-brand" data-i18n="brand">خالد<span class="dot">.</span></a>
+  <div class="wrap footer-inner">
+    <a href="#top" class="brand"><span data-i18n="brand">خالد</span><i class="tick">✓</i></a>
     <nav class="f-links">
-      <a href="#journey" data-i18n="nav.journey">الرحلة</a>
-      <a href="#certs" data-i18n="nav.certs">الشهادات</a>
-      <a href="#expertise" data-i18n="nav.expertise">التخصص</a>
+      <a href="#analytics" data-i18n="nav.analytics">التحليل والأتمتة</a>
+      <a href="#cia" data-i18n="nav.cia">رحلة CIA</a>
+      <a href="#credentials" data-i18n="nav.credentials">الشهادات</a>
       <a href="#experience" data-i18n="nav.experience">الخبرة</a>
-      <a href="#projects" data-i18n="nav.projects">المشاريع</a>
     </nav>
     <p class="f-copy" data-i18n="footer">© 2026 خالد. الرياض، المملكة العربية السعودية.</p>
   </div>
