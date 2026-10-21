@@ -134,6 +134,13 @@ html[lang="en"] .lang { font-family: var(--body); font-size: 13px; }
 
 .layer { position: absolute; z-index: 3; opacity: 0; will-change: opacity, transform; pointer-events: none; }
 .layer.live { pointer-events: auto; }
+.layer-hero { opacity: 1; pointer-events: auto; }   /* visible before any script runs */
+.stage-sticky { background:
+  radial-gradient(60% 55% at 30% 42%, rgba(142, 166, 200, .10), transparent 70%),
+  radial-gradient(40% 35% at 30% 45%, rgba(255, 178, 46, .06), transparent 70%), var(--ink); }
+html[dir="ltr"] .stage-sticky { background:
+  radial-gradient(60% 55% at 70% 42%, rgba(142, 166, 200, .10), transparent 70%),
+  radial-gradient(40% 35% at 70% 45%, rgba(255, 178, 46, .06), transparent 70%), var(--ink); }
 .layer-hero {
   inset-inline-start: 0; bottom: 9vh; width: min(760px, 100%);
   padding-left: var(--gutter); padding-right: var(--gutter-r);

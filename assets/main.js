@@ -81,7 +81,7 @@ const UI = {
 const i18nEls = $$("[data-i18n]");
 i18nEls.forEach(el => { el.dataset.ar = el.innerHTML; });
 const metaDesc = $('meta[name="description"]');
-const descAr = metaDesc.content;
+const descAr = metaDesc ? metaDesc.content : "";
 let lang = "ar";
 
 function setLang(l, save) {
@@ -91,7 +91,7 @@ function setLang(l, save) {
   document.documentElement.dir = en ? "ltr" : "rtl";
   i18nEls.forEach(el => { el.innerHTML = en ? (EN[el.dataset.i18n] ?? el.dataset.ar) : el.dataset.ar; });
   document.title = UI[lang].title;
-  metaDesc.content = en ? "Khalid, Senior Internal Auditor. Risk-based audit powered by data analytics and automation, and the road to the CIA." : descAr;
+  if (metaDesc) metaDesc.content = en ? "Khalid, Senior Internal Auditor. Risk-based audit powered by data analytics and automation, and the road to the CIA." : descAr;
   S.rtl = !en;
   updateRunLabel();
   if (save) { try { localStorage.setItem("lang", lang); } catch (e) {} }
